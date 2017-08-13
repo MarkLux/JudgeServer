@@ -1,9 +1,18 @@
 package config
 
+import (
+	"strings"
+)
+
+
+
 type CommandStr string
 
-func (*CommandStr) fillWith(param map[string]string) {
-
+func (c *CommandStr) FillWith(param map[string]string) string {
+	for k, v := range param {
+		*c = CommandStr(strings.Replace(string(*c), k, v, -1))
+	}
+	return string(*c)
 }
 
 type CompileConfig struct {
