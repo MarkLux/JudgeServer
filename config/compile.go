@@ -2,9 +2,9 @@ package config
 
 import (
 	"strings"
+
+	"github.com/MarkLux/Judger_GO"
 )
-
-
 
 type CommandStr string
 
@@ -75,6 +75,22 @@ var CompileCpp = LanguageCompileConfig{
 	},
 }
 
+var ComplieJava = LanguageCompileConfig{
+	CompileConfig: CompileConfig{
+		SrcName:        "Main.java",
+		ExeName:        "Main",
+		MaxCpuTime:     3000,
+		MaxRealTime:    5000,
+		MaxMemory:      judger.UNLIMITED,
+		CompileCommand: "/usr/bin/javac {src_path} -d {exe_dir} -encoding UTF8",
+	},
+	RunConfig: RunConfig{
+		Command:     "/usr/bin/java -cp {exe_dir} -Xss1M -XX:MaxPermSize=16M -XX:PermSize=8M -Xms16M -Xmx{max_memory}k -Djava.security.manager -Dfile.encoding=UTF-8 -Djava.security.policy==/etc/java_policy -Djava.awt.headless=true Main",
+		SeccompRule: "none",
+		Env:         append(DefaultEnv, "MALLOC_ARENA_MAX=1"),
+	},
+}
+
 var CompilePython2 = LanguageCompileConfig{
 	CompileConfig: CompileConfig{
 		SrcName:        "solution.py",
@@ -86,7 +102,7 @@ var CompilePython2 = LanguageCompileConfig{
 	},
 	RunConfig: RunConfig{
 		Command:     "/usr/bin/python {exe_path}",
-		SeccompRule: "default",
+		SeccompRule: "none",
 		Env:         DefaultEnv,
 	},
 }

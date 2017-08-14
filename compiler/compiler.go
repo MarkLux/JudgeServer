@@ -1,6 +1,7 @@
 package compiler
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -23,11 +24,23 @@ func Compile(compileConfig config.CompileConfig, srcPath string, outputDir strin
 		"{exe_path}": exePath,
 	}
 	command := compileConfig.CompileCommand.FillWith(replacements)
+
+	// debug output
+
+	fmt.Println("command:	" + command)
+
 	// file compiler.out contains the ouput of compile progarm's output (rewrite).
 	compilerOut := filepath.Join(outputDir, "compiler.out")
 
 	// split the command into execute path and args.
 	args := strings.Split(command, " ")
+
+	// debug output
+
+	for i, v := range args {
+		fmt.Println("args: ", i, " ", v)
+	}
+
 	//parse args
 
 	result := judger.JudgerRun(judger.Config{
@@ -48,6 +61,10 @@ func Compile(compileConfig config.CompileConfig, srcPath string, outputDir strin
 		Uid:              config.COMPILER_USER_UID,
 		Gid:              config.COMPILER_GROUP_UID,
 	})
+
+	// debug output
+
+	fmt.Printf("%#v", result)
 
 	return string(result.Result)
 }
