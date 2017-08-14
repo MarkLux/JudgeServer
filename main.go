@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/MarkLux/JudgeServer/compiler"
+
 	"github.com/MarkLux/JudgeServer/config"
 )
 
@@ -18,6 +19,7 @@ func main() {
 }
 
 func test() {
-	str := compiler.Compile(config.CompileC.CompileConfig, "/home/src", "/home/output")
+	str := compiler.Compile(config.CompileC.CompileConfig, "/home/judge/src", "/home/judge/output")
+
 	fmt.Println(str)
 }

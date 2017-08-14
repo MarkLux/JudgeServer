@@ -15,7 +15,7 @@ import (
  */
 
 func Compile(compileConfig config.CompileConfig, srcPath string, outputDir string) string {
-	exePath, _ := filepath.Abs(filepath.Join(outputDir, compileConfig.ExeName))
+	exePath := filepath.Join(outputDir, compileConfig.ExeName)
 	// replace param then build the real compile command.
 	replacements := map[string]string{
 		"{src_path}": srcPath,
@@ -27,30 +27,24 @@ func Compile(compileConfig config.CompileConfig, srcPath string, outputDir strin
 	compilerOut := filepath.Join(outputDir, "compiler.out")
 
 	// split the command into execute path and args.
-	spilts := strings.Split(command, " ")
+	args := strings.Split(command, " ")
 	//parse args
-	var args [judger.ARGS_MAX_NUMBER]string
-	for i, split := range spilts[1:] {
-		args[i] = split
-	}
-	//parse envs
-	var envs [judger.ENV_MAX_NUMBER]string
-	envs[0] = "PATH=" + os.Getenv("PATH")
 
 	result := judger.JudgerRun(judger.Config{
 		MaxCpuTime:       compileConfig.MaxCpuTime,
 		MaxRealTime:      compileConfig.MaxRealTime,
 		MaxMemory:        compileConfig.MaxMemory,
 		MaxStack:         128 * 1024 * 1024,
+		MaxOutPutSize:    judger.UNLIMITED,
 		MaxProcessNumber: judger.UNLIMITED,
-		ExePath:          spilts[0],
+		ExePath:          args[0],
 		InputPath:        srcPath,
 		OutputPath:       compilerOut,
 		ErrorPath:        compilerOut,
 		Args:             args,
-		Env:              envs,
+		Env:              []string{"PATH=" + os.Getenv("PATH")},
 		LogPath:          config.COMPILER_LOG_PATH,
-		SecCompRuleName:  "",
+		SecCompRuleName:  "none",
 		Uid:              config.COMPILER_USER_UID,
 		Gid:              config.COMPILER_GROUP_UID,
 	})
