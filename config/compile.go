@@ -75,7 +75,7 @@ var CompileCpp = LanguageCompileConfig{
 	},
 }
 
-var ComplieJava = LanguageCompileConfig{
+var CompileJava = LanguageCompileConfig{
 	CompileConfig: CompileConfig{
 		SrcName:        "Main.java",
 		ExeName:        "Main",

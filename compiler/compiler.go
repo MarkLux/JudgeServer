@@ -25,21 +25,11 @@ func Compile(compileConfig config.CompileConfig, srcPath string, outputDir strin
 	}
 	command := compileConfig.CompileCommand.FillWith(replacements)
 
-	// debug output
-
-	fmt.Println("command:	" + command)
-
 	// file compiler.out contains the ouput of compile progarm's output (rewrite).
 	compilerOut := filepath.Join(outputDir, "compiler.out")
 
 	// split the command into execute path and args.
 	args := strings.Split(command, " ")
-
-	// debug output
-
-	for i, v := range args {
-		fmt.Println("args: ", i, " ", v)
-	}
 
 	//parse args
 
