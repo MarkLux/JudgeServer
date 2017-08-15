@@ -1,7 +1,10 @@
 package compiler
 
 import (
+	"errors"
 	"fmt"
+	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -15,7 +18,7 @@ import (
 * return the executable file path
  */
 
-func Compile(compileConfig config.CompileConfig, srcPath string, outputDir string) string {
+func Compile(compileConfig config.CompileConfig, srcPath string, outputDir string) (string, error) {
 	exePath := filepath.Join(outputDir, compileConfig.ExeName)
 	// replace param then build the real compile command.
 	replacements := map[string]string{
@@ -54,7 +57,23 @@ func Compile(compileConfig config.CompileConfig, srcPath string, outputDir strin
 
 	// debug output
 
-	fmt.Printf("%#v", result)
+	log.Printf("Compile Result\n")
+	log.Printf("%#v\n", result)
 
-	return string(result.Result)
+	if result.Result != judger.SUCCESS {
+		// read the compiler output and
+		_, err := os.Stat(compilerOut)
+		var errOut string
+		if err == nil {
+			errByte, _ := ioutil.ReadFile(compilerOut)
+			errOut = string(errByte[:])
+			os.Remove(compilerOut)
+		} else {
+			errOut = fmt.Sprintf("Compiler Runtime Error , info %#v", result)
+		}
+		return exePath, errors.New(errOut)
+	}
+
+	os.Remove(compilerOut)
+	return exePath, nil
 }

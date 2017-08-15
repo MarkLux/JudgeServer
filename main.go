@@ -19,7 +19,11 @@ func main() {
 }
 
 func test() {
-	str := compiler.Compile(config.CompileC.CompileConfig, "/home/judge/src", "/home/judge/output")
+	str, err := compiler.Compile(config.CompileC.CompileConfig, "/home/judge/src", "/home/judge/output")
+
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	fmt.Println(str)
 }
