@@ -1,6 +1,7 @@
 package client
 
 import (
+	"bytes"
 	"crypto/md5"
 	"errors"
 	"fmt"
@@ -46,11 +47,13 @@ type JudgeClient struct {
 func (jc *JudgeClient) JudgeOne(testInPath string, testOutPath string) (userOutputMd5 string, res bool, err error) {
 	commands := strings.Split(string(jc.RunConf.Command), " ")
 	userOutputPath := filepath.Join(jc.SubmissionDir, "user.out")
+	fmt.Println(userOutputPath)
 	runResult := judger.JudgerRun(judger.Config{
 		MaxCpuTime:       jc.MaxCpuTime,
 		MaxMemory:        jc.MaxMemory,
 		MaxStack:         128 * 1024 * 1024,
 		MaxOutPutSize:    1024 * 1024 * 1024,
+		MaxRealTime:      jc.MaxCpuTime * 3,
 		MaxProcessNumber: judger.UNLIMITED,
 		ExePath:          commands[0],
 		InputPath:        testInPath,
@@ -65,7 +68,7 @@ func (jc *JudgeClient) JudgeOne(testInPath string, testOutPath string) (userOutp
 	})
 	fmt.Printf("%#v", runResult)
 
-	if runResult.Result != judger.SUCCESS {
+	if runResult.Error != judger.SUCCESS {
 		err = errors.New("Runtime Error, Code" + fmt.Sprintf("%#v", runResult))
 		return
 	}
@@ -77,7 +80,10 @@ func (jc *JudgeClient) JudgeOne(testInPath string, testOutPath string) (userOutp
 
 func compareOutput(testOutPath string, userOutputPath string) (outputMd5 string, res bool) {
 	testOut, _ := ioutil.ReadFile(testOutPath)
-	testMD5 := md5.Sum(testOut)
+	// Linux files has a line break at the end defaultly,trim it!
+	trimed := bytes.TrimRight(testOut, "\n")
+	testOut, _ = ioutil.ReadFile(testOutPath)
+	testMD5 := md5.Sum(trimed)
 	userOut, _ := ioutil.ReadFile(userOutputPath)
 	userMD5 := md5.Sum(userOut)
 	outputMd5 = fmt.Sprintf("%x", userMD5)

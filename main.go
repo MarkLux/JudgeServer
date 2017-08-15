@@ -3,9 +3,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/MarkLux/JudgeServer/config"
-
 	"github.com/MarkLux/JudgeServer/client"
+	"github.com/MarkLux/JudgeServer/config"
 )
 
 func main() {
@@ -36,7 +35,8 @@ func test() {
 		SubmissionDir: "/home/judge/user/1001",
 	}
 
-	m5, res, err := jc.JudgeOne("/home/judge/testcases/1001/1.in", "/home.judge/testcase/1001/1.out")
+	m5, res, err := jc.JudgeOne("/home/judge/testcases/1001/1.in", "/home/judge/testcase/1001/1.out")
 
 	println("m5 = ", m5, "; res = ", res, " ;err = ", err)
+
 }
