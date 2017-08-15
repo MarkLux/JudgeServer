@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 
-	"github.com/MarkLux/JudgeServer/compiler"
-
 	"github.com/MarkLux/JudgeServer/config"
+
+	"github.com/MarkLux/JudgeServer/client"
 )
 
 func main() {
@@ -19,11 +19,24 @@ func main() {
 }
 
 func test() {
-	str, err := compiler.Compile(config.CompileC.CompileConfig, "/home/judge/src", "/home/judge/output")
 
-	if err != nil {
-		fmt.Println(err)
+	conf := config.CompileC.RunConfig
+
+	conf.Command.FillWith(map[string]string{
+		"{exe_path}": "/home/judge/output/main",
+	})
+
+	fmt.Println(conf.Command)
+
+	jc := client.JudgeClient{
+		MaxCpuTime:    1000,
+		MaxMemory:     128 * 1024 * 1024,
+		RunConf:       conf,
+		TestCaseId:    1001,
+		SubmissionDir: "/home/judge/user/1001",
 	}
 
-	fmt.Println(str)
+	m5, res, err := jc.JudgeOne("/home/judge/testcases/1001/1.in", "/home.judge/testcase/1001/1.out")
+
+	println("m5 = ", m5, "; res = ", res, " ;err = ", err)
 }
