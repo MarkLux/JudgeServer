@@ -78,9 +78,6 @@ func (jc *JudgeClient) Judge() (judgeResult JudgeResult, err error) {
 func (jc *JudgeClient) judgeOne(ch chan<- RunResult, testInPath string, testOutPath string) {
 	commands := strings.Split(string(jc.RunConf.Command), " ")
 	userOutputPath := filepath.Join(jc.SubmissionDir, "user.out")
-	fmt.Println(testInPath)
-	fmt.Println(testOutPath)
-	fmt.Println(userOutputPath)
 	result := judger.JudgerRun(judger.Config{
 		MaxCpuTime:       jc.MaxCpuTime,
 		MaxMemory:        jc.MaxMemory,

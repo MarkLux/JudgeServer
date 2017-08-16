@@ -1,7 +1,6 @@
 package server
 
 import (
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -33,7 +32,6 @@ func Ping(c *gin.Context) {
 
 	if err != nil {
 		hostname = ""
-		log.Println("Failed to get HostName")
 	}
 
 	cpuPercent, _ := cpu.Percent(0, false)
@@ -104,7 +102,7 @@ func Judge(c *gin.Context) {
 	// write source code into file.
 
 	srcPath := filepath.Join(submissionDir, conf.SrcName)
-	log.Println("src path :", srcPath)
+	// log.Println("src path :", srcPath)
 	var srcFile *os.File
 	if srcFile, err = os.Create(srcPath); err != nil {
 		c.JSON(http.StatusOK, gin.H{
@@ -177,8 +175,7 @@ func Judge(c *gin.Context) {
 func initSubmissionEnv(submissionID string) (string, error) {
 	submissionDirPath := filepath.Join(config.SUBMISSION_DIR, submissionID)
 
-	if err := os.Mkdir(submissionDirPath, 077); err != nil {
-		log.Println("fail to create submission dirpath :", err.Error())
+	if err := os.Mkdir(submissionDirPath, 0777); err != nil {
 		return "", err
 	}
 

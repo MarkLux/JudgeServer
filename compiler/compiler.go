@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -57,8 +56,8 @@ func Compile(compileConfig config.CompileConfig, srcPath string, outputDir strin
 
 	// debug output
 
-	log.Printf("Compile Result\n")
-	log.Printf("%#v\n", result)
+	// log.Printf("Compile Result\n")
+	// log.Printf("%#v\n", result)
 
 	if result.Result != judger.SUCCESS {
 		// read the compiler output and
