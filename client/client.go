@@ -3,7 +3,6 @@ package client
 import (
 	"bytes"
 	"crypto/md5"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -22,13 +21,13 @@ type JudgeResult struct {
 }
 
 type RunResult struct {
-	CpuTime     int
-	Result      judger.ResultCode
-	RealTime    int
-	Signal      int
-	Error       judger.ErrorCode
-	OutputMD5   string
-	TestCaseNum int
+	CpuTime   int
+	Result    judger.ResultCode
+	RealTime  int
+	Memory    int
+	Signal    int
+	Error     judger.ErrorCode
+	OutputMD5 string
 }
 
 type JudgeClient struct {
@@ -40,15 +39,41 @@ type JudgeClient struct {
 	TestCaseId    int
 }
 
-// func (*JudgeClient) Judge() (JudgeResult, error) {
+func (jc *JudgeClient) Judge() (judgeResult JudgeResult, err error) {
+	// load testcases files
+	testFiles, err := loadTestCases(jc.TestCaseId)
+	if err != nil {
+		return JudgeResult{}, err
+	}
 
-// }
+	// build channel
+	caseCount := len(testFiles)
+	caseCh := make(chan RunResult, caseCount)
 
-func (jc *JudgeClient) JudgeOne(testInPath string, testOutPath string) (userOutputMd5 string, res bool, err error) {
+	for _, t := range testFiles {
+		testInPath := filepath.Join(config.TEST_CASE_DIR, t+".in")
+		testOutPath := filepath.Join(config.TEST_CASE_DIR, t+".out")
+		go jc.judgeOne(caseCh, testInPath, testOutPath)
+	}
+
+	for rs := range caseCh {
+		if rs.Result == judger.SUCCESS {
+			judgeResult.Passed = append(judgeResult.Passed, rs)
+		} else {
+			judgeResult.UnPassed = append(judgeResult.UnPassed, rs)
+		}
+	}
+
+	err = nil
+
+	return
+}
+
+func (jc *JudgeClient) judgeOne(ch chan<- RunResult, testInPath string, testOutPath string) {
 	commands := strings.Split(string(jc.RunConf.Command), " ")
 	userOutputPath := filepath.Join(jc.SubmissionDir, "user.out")
 	fmt.Println(userOutputPath)
-	runResult := judger.JudgerRun(judger.Config{
+	result := judger.JudgerRun(judger.Config{
 		MaxCpuTime:       jc.MaxCpuTime,
 		MaxMemory:        jc.MaxMemory,
 		MaxStack:         128 * 1024 * 1024,
@@ -66,15 +91,29 @@ func (jc *JudgeClient) JudgeOne(testInPath string, testOutPath string) (userOutp
 		Uid:              config.RUN_USER_UID,
 		Gid:              config.RUN_GROUP_UID,
 	})
-	fmt.Printf("%#v", runResult)
+	fmt.Printf("%#v", result)
 
-	if runResult.Error != judger.SUCCESS {
-		err = errors.New("Runtime Error, Code" + fmt.Sprintf("%#v", runResult))
-		return
+	// if result.Error != judger.SUCCESS {
+	// 	err = errors.New("Runtime Error, Code" + fmt.Sprintf("%#v", result))
+	// 	return
+	// }
+
+	userOutputMd5, res := compareOutput(testOutPath, userOutputPath)
+	if !res {
+		// set to wrong answer
+		result.Result = -1
 	}
 
-	userOutputMd5, res = compareOutput(testOutPath, userOutputPath)
-	err = nil
+	runResult := RunResult{
+		CpuTime:   result.CpuTime,
+		RealTime:  result.RealTime,
+		Memory:    result.Memory,
+		Result:    result.Result,
+		Error:     result.Error,
+		OutputMD5: userOutputMd5,
+		Signal:    result.Signal,
+	}
+	ch <- runResult
 	return
 }
 
@@ -82,7 +121,6 @@ func compareOutput(testOutPath string, userOutputPath string) (outputMd5 string,
 	testOut, _ := ioutil.ReadFile(testOutPath)
 	// Linux files has a line break at the end defaultly,trim it!
 	trimed := bytes.TrimRight(testOut, "\n")
-	testOut, _ = ioutil.ReadFile(testOutPath)
 	testMD5 := md5.Sum(trimed)
 	userOut, _ := ioutil.ReadFile(userOutputPath)
 	userMD5 := md5.Sum(userOut)

@@ -25,8 +25,6 @@ func test() {
 		"{exe_path}": "/home/judge/output/main",
 	})
 
-	fmt.Println(conf.Command)
-
 	jc := client.JudgeClient{
 		MaxCpuTime:    1000,
 		MaxMemory:     128 * 1024 * 1024,
@@ -35,8 +33,14 @@ func test() {
 		SubmissionDir: "/home/judge/user/1001",
 	}
 
-	m5, res, err := jc.JudgeOne("/home/judge/testcases/1001/1.in", "/home/judge/testcase/1001/1.out")
+	rs, _ := jc.Judge()
 
-	println("m5 = ", m5, "; res = ", res, " ;err = ", err)
-
+	for _, p := range rs.Passed {
+		fmt.Println("passed: ")
+		fmt.Printf("%#v", p)
+	}
+	for _, u := range rs.UnPassed {
+		fmt.Println("unpassed: ")
+		fmt.Printf("%#v", u)
+	}
 }
