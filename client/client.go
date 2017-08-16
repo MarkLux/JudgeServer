@@ -51,19 +51,20 @@ func (jc *JudgeClient) Judge() (judgeResult JudgeResult, err error) {
 	caseCh := make(chan RunResult, caseCount)
 
 	for _, t := range testFiles {
-		testInPath := filepath.Join(config.TEST_CASE_DIR, t+".in")
-		testOutPath := filepath.Join(config.TEST_CASE_DIR, t+".out")
+		testInPath := filepath.Join(config.TEST_CASE_DIR, strconv.Itoa(jc.TestCaseId), t+".in")
+		testOutPath := filepath.Join(config.TEST_CASE_DIR, strconv.Itoa(jc.TestCaseId), t+".out")
+		// create a new go routine for each testcase file
 		go jc.judgeOne(caseCh, testInPath, testOutPath)
 	}
 
-	for rs := range caseCh {
+	for i := 0; i < caseCount; i++ {
+		rs := <-caseCh
 		if rs.Result == judger.SUCCESS {
 			judgeResult.Passed = append(judgeResult.Passed, rs)
 		} else {
 			judgeResult.UnPassed = append(judgeResult.UnPassed, rs)
 		}
 	}
-
 	err = nil
 
 	return
@@ -72,6 +73,8 @@ func (jc *JudgeClient) Judge() (judgeResult JudgeResult, err error) {
 func (jc *JudgeClient) judgeOne(ch chan<- RunResult, testInPath string, testOutPath string) {
 	commands := strings.Split(string(jc.RunConf.Command), " ")
 	userOutputPath := filepath.Join(jc.SubmissionDir, "user.out")
+	fmt.Println(testInPath)
+	fmt.Println(testOutPath)
 	fmt.Println(userOutputPath)
 	result := judger.JudgerRun(judger.Config{
 		MaxCpuTime:       jc.MaxCpuTime,
@@ -91,7 +94,6 @@ func (jc *JudgeClient) judgeOne(ch chan<- RunResult, testInPath string, testOutP
 		Uid:              config.RUN_USER_UID,
 		Gid:              config.RUN_GROUP_UID,
 	})
-	fmt.Printf("%#v", result)
 
 	// if result.Error != judger.SUCCESS {
 	// 	err = errors.New("Runtime Error, Code" + fmt.Sprintf("%#v", result))
