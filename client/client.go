@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 
@@ -40,6 +41,10 @@ type JudgeClient struct {
 }
 
 func (jc *JudgeClient) Judge() (judgeResult JudgeResult, err error) {
+
+	// only for test
+	runtime.GOMAXPROCS(runtime.NumCPU())
+
 	// load testcases files
 	testFiles, err := loadTestCases(jc.TestCaseId)
 	if err != nil {

@@ -15,4 +15,6 @@ const (
 	TEST_CASE_DIR = "/home/judge/testcases"
 	// TEST_CASE_DIR      = "/Users/mark/TestCases"
 	JUDGE_RUN_LOG_PATH = "/home/judge/log/run.log"
+	SUBMISSION_DIR     = "/home/judge/submissions"
+	// SUBMISSION_DIR     = "/Users/mark/Submissions"
 )

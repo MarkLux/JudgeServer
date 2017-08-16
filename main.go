@@ -5,16 +5,20 @@ import (
 
 	"github.com/MarkLux/JudgeServer/client"
 	"github.com/MarkLux/JudgeServer/config"
+	"github.com/MarkLux/JudgeServer/server"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	// r := gin.Default()
+	r := gin.Default()
 
-	// r.GET("/ping", server.Ping)
+	r.GET("/ping", server.Ping)
 
-	// r.Run(":8090")
+	r.POST("/judge", server.Judge)
 
-	test()
+	r.Run(":8070")
+
+	// test()
 }
 
 func test() {
