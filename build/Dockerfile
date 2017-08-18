@@ -1,6 +1,6 @@
 FROM ubuntu:14.04
 MAINTAINER MarkLux
-ADD sources.list /etc/apt/sources.list
+# ADD sources.list /etc/apt/sources.list
 RUN apt-get update&&apt-get -y install \
     gcc g++\
     libseccomp-dev\
@@ -20,12 +20,14 @@ RUN go get -u -v github.com/MarkLux/Judger_GO&&\
     go get -u -v github.com/MarkLux/JudgeServer&&\
     go get -u -v github.com/gin-gonic/gin&&\
     go get -u -v github.com/satori/go.uuid&&\
-    go get -u -v github.com/shirou/gosputil&&\
-    mkdir /home/judge/go/src/golang.org/x /usr/lib/judger
+    # go get -u -v github.com/shirou/gopsutil&&\
+    mkdir -p /home/judge/go/src/golang.org/x /usr/lib/judger /home/judge/go/src/github.com/shirou
 WORKDIR /home/judge/go/src/golang.org/x
 RUN git clone https://github.com/golang/sys.git
+WORKDIR /home/judge/go/src/github.com/shirou
+RUN git clone https://github.com/shirou/gopsutil.git
 WORKDIR /home/judge/go/src/github.com/MarkLux/Judger_GO
 RUN mv libjudger.so /usr/lib/judger/libjudger.so
-
-
+WORKDIR /home/judge/go/src/github.com/MarkLux/JudgeServer
+CMD go run main.go
 EXPOSE 8090
