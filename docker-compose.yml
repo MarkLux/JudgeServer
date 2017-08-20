@@ -1,0 +1,13 @@
+version: "2"
+services:
+  judge_server:
+    image: registry.cn-qingdao.aliyuncs.com/marklux/judge_server:1.0
+    container_name: judge_server
+    restart: always
+    volumes:
+      - $PWD/judge/testcases:/home/judge/testcases
+      - $PWD/judge/submissions:/home/judge/submissions
+      - $PWD/judge/log:/home/judge/log
+      - $PWD/judge/output:/home/judge/output
+    ports:
+      - "8090:8090"
