@@ -16,18 +16,20 @@ RUN wget https://www.golangtc.com/static/go/1.8.3/go1.8.3.linux-amd64.tar.gz&&\
 ENV GOROOT /usr/local/go
 ENV GOPATH /home/judge/go
 ENV PATH /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/go/bin
-RUN go get -u -v github.com/MarkLux/Judger_GO&&\
-    go get -u -v github.com/MarkLux/JudgeServer&&\
-    go get -u -v github.com/gin-gonic/gin&&\
-    go get -u -v github.com/satori/go.uuid&&\
-    # go get -u -v github.com/shirou/gopsutil&&\
-    mkdir -p /home/judge/go/src/golang.org/x /usr/lib/judger /home/judge/go/src/github.com/shirou
+RUN mkdir -p /home/judge/go/src/golang.org/x /usr/lib/judger /home/judge/go/src/github.com/shirou
 WORKDIR /home/judge/go/src/golang.org/x
 RUN git clone https://github.com/golang/sys.git
 WORKDIR /home/judge/go/src/github.com/shirou
 RUN git clone https://github.com/shirou/gopsutil.git
+RUN go get -v github.com/MarkLux/Judger_GO&&\
+    go get -v github.com/MarkLux/JudgeServer&&\
+    go get -u -v github.com/gin-gonic/gin&&\
+    go get -u -v github.com/satori/go.uuid
 WORKDIR /home/judge/go/src/github.com/MarkLux/Judger_GO
 RUN mv libjudger.so /usr/lib/judger/libjudger.so
 WORKDIR /home/judge/go/src/github.com/MarkLux/JudgeServer
+RUN apt-get clean \
+    && apt-get autoclean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
 CMD go run main.go
 EXPOSE 8090
