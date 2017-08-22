@@ -27,9 +27,9 @@ RUN go get -v github.com/MarkLux/Judger_GO&&\
     go get -u -v github.com/satori/go.uuid
 WORKDIR /home/judge/go/src/github.com/MarkLux/Judger_GO
 RUN mv libjudger.so /usr/lib/judger/libjudger.so
-WORKDIR /home/judge/go/src/github.com/MarkLux/JudgeServer
 RUN apt-get clean \
     && apt-get autoclean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* 
+WORKDIR /home/judge/go/src/github.com/MarkLux/JudgeServer
 CMD go run main.go
 EXPOSE 8090
