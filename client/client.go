@@ -59,7 +59,7 @@ func (jc *JudgeClient) Judge() (judgeResult JudgeResult, err error) {
 		testInPath := filepath.Join(config.TEST_CASE_DIR, strconv.Itoa(jc.TestCaseId), t+".in")
 		testOutPath := filepath.Join(config.TEST_CASE_DIR, strconv.Itoa(jc.TestCaseId), t+".out")
 		// create a new go routine for each testcase file
-		go jc.judgeOne(caseCh, testInPath, testOutPath)
+		go jc.judgeOne(caseCh, testInPath, testOutPath, t+".out")
 	}
 
 	for i := 0; i < caseCount; i++ {
@@ -75,9 +75,9 @@ func (jc *JudgeClient) Judge() (judgeResult JudgeResult, err error) {
 	return
 }
 
-func (jc *JudgeClient) judgeOne(ch chan<- RunResult, testInPath string, testOutPath string) {
+func (jc *JudgeClient) judgeOne(ch chan<- RunResult, testInPath string, testOutPath string, userOutFilename string) {
 	commands := strings.Split(string(jc.RunConf.Command), " ")
-	userOutputPath := filepath.Join(jc.SubmissionDir, "user.out")
+	userOutputPath := filepath.Join(jc.SubmissionDir, userOutFilename)
 	result := judger.JudgerRun(judger.Config{
 		MaxCpuTime:       jc.MaxCpuTime,
 		MaxMemory:        jc.MaxMemory,
@@ -127,7 +127,8 @@ func compareOutput(testOutPath string, userOutputPath string) (outputMd5 string,
 	trimed := bytes.TrimRight(testOut, "\n")
 	testMD5 := md5.Sum(trimed)
 	userOut, _ := ioutil.ReadFile(userOutputPath)
-	userMD5 := md5.Sum(userOut)
+	trimed = bytes.TrimRight(userOut, "\n")
+	userMD5 := md5.Sum(trimed)
 	outputMd5 = fmt.Sprintf("%x", userMD5)
 	res = bool(testMD5 == userMD5)
 	return
