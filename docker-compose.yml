@@ -9,5 +9,7 @@ services:
       - $PWD/judge/submissions:/home/judge/submissions
       - $PWD/judge/log:/home/judge/log
       - $PWD/judge/output:/home/judge/output
+    enviornments:
+      - RPC_TOKEN={YOUR TOKEN}
     ports:
       - "8090:8090"
