@@ -1,6 +1,7 @@
 package server
 
 import (
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -28,11 +29,12 @@ type UserInput struct {
 
 func Ping(c *gin.Context) {
 
-	if !checkToken(c.GetHeader("token")) {
+	if !checkToken(c.GetHeader("Token")) {
 		c.JSON(http.StatusOK, gin.H{
 			"code": -1,
 			"data": "wrong token",
 		})
+		return
 	}
 
 	hostname, err := os.Hostname()
@@ -58,11 +60,12 @@ func Judge(c *gin.Context) {
 	var input UserInput
 	var err error
 
-	if !checkToken(c.GetHeader("token")) {
+	if !checkToken(c.GetHeader("Token")) {
 		c.JSON(http.StatusOK, gin.H{
 			"code": -1,
 			"data": "wrong token",
 		})
+		return
 	}
 
 	if err = c.BindJSON(&input); err != nil {
@@ -202,6 +205,8 @@ func freeSubmissionEnv(submissionDirPath string) error {
 
 func checkToken(token string) bool {
 	localToken := os.Getenv("RPC_TOKEN")
+	log.Println(localToken)
+	log.Println(token)
 	if token != localToken {
 		return false
 	}
