@@ -102,4 +102,4 @@ data contains results for each test case (`with a .in and a .out file`),with Acc
 
 you can use `build/Dockerfile` to build the docker image to use
 
-or use this repsository that I built on docker hub: https://hub.docker.com/r/marklux/judge_server/
+or use auto-build docker image from registry.cn-qingdao.aliyuncs.com/marklux/judge-server:latest
