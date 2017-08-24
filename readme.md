@@ -103,3 +103,20 @@ data contains results for each test case (`with a .in and a .out file`),with Acc
 you can use `build/Dockerfile` to build the docker image to use
 
 or use auto-build docker image from registry.cn-qingdao.aliyuncs.com/marklux/judge-server:latest
+
+## use docker image to deploy
+
+if you have docker-compose then use the `docker-compose.yml` file,edit it fill your rpc_token and check the volume dirs,then run `docker-compose up -d` to start the server.
+
+if you dont have docker-compose,just use the docker image in the original way:
+
+```
+# get the latest image
+docker pull registry.cn-qingdao.aliyuncs.com/marklux/judge-server:latest
+# make dir
+mkdir -p judge/testcases judge/submissions judge/log judge/output
+# run the container(an example)
+docker run --name=judgeserver -d -v $PWD/judge/testcases:/home/judge/testcases -v $PWD/judge/submissions:/home/judge/submissions -v $PWD/judge/log:/home/judge/log -v $PWD/judge/output:/home/judge/output -p 8090:8090 -e "RPC_TOKEN=abcdefg" registry.cn-qingdao.aliyuncs.com/marklux/judge-server:latest
+```
+
+if you failed,remember to check the volumes' permission!
