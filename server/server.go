@@ -1,11 +1,12 @@
 package server
 
 import (
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 	"runtime"
+
+	"github.com/MarkLux/JudgeServer/rsync"
 
 	"github.com/MarkLux/JudgeServer/client"
 
@@ -189,8 +190,29 @@ func Judge(c *gin.Context) {
 
 }
 
-func SyncSingle(c *gin.Context) {
-
+func SyncTestCase(c *gin.Context) {
+	if !checkToken(c.GetHeader("Token")) {
+		c.JSON(http.StatusOK, gin.H{
+			"code": -1,
+			"data": "wrong token",
+		})
+		return
+	}
+	testcaseId := c.Query("tid")
+	var err error
+	if testcaseId != "" {
+		if err = rsync.SyncSingle(testcaseId); err == nil {
+			c.JSON(http.StatusOK, gin.H{
+				"code": 0,
+			})
+			return
+		}
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"code": -1,
+		"data": err,
+	})
+	return
 }
 
 func initSubmissionEnv(submissionID string) (string, error) {
@@ -209,8 +231,6 @@ func freeSubmissionEnv(submissionDirPath string) error {
 
 func checkToken(token string) bool {
 	localToken := os.Getenv("RPC_TOKEN")
-	log.Println(localToken)
-	log.Println(token)
 	if token != localToken {
 		return false
 	}

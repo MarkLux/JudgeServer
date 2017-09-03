@@ -5,7 +5,8 @@ RUN apt-get update&&apt-get -y install \
     gcc g++\
     libseccomp-dev\
     git\
-    wget
+    wget\
+    rsync
 RUN mkdir -p /home/judge
 WORKDIR /home/judge
 RUN wget https://www.golangtc.com/static/go/1.8.3/go1.8.3.linux-amd64.tar.gz&&\

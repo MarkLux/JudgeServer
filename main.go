@@ -10,7 +10,9 @@ func main() {
 
 	r.GET("/ping", server.Ping)
 
+	r.GET("/sync", server.SyncTestCase)
+
 	r.POST("/judge", server.Judge)
 
-	r.Run(":8090")
+	r.Run(":8010")
 }
