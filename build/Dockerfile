@@ -1,12 +1,14 @@
 FROM ubuntu:14.04
 MAINTAINER MarkLux
 # ADD sources.list /etc/apt/sources.list
+RUN add-apt-repository ppa:openjdk-r/ppa
 RUN apt-get update&&apt-get -y install \
     gcc g++\
     libseccomp-dev\
     git\
     wget\
-    rsync
+    rsync\
+    openjdk-7-jdk
 RUN mkdir -p /home/judge
 WORKDIR /home/judge
 RUN wget https://www.golangtc.com/static/go/1.8.3/go1.8.3.linux-amd64.tar.gz&&\
