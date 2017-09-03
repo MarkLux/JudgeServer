@@ -189,6 +189,10 @@ func Judge(c *gin.Context) {
 
 }
 
+func SyncSingle(c *gin.Context) {
+
+}
+
 func initSubmissionEnv(submissionID string) (string, error) {
 	submissionDirPath := filepath.Join(config.SUBMISSION_DIR, submissionID)
 
