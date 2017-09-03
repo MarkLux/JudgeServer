@@ -11,5 +11,7 @@ services:
       - $PWD/judge/output:/home/judge/output
     environment:
       - RPC_TOKEN={YOUR TOKEN}
+      - RSYNC_HOST={YOUR RSYNC HOST}
+      - RSYNC_USER={YOUR RSYNC USER}
     ports:
       - "8090:8090"
