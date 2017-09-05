@@ -14,5 +14,5 @@ func main() {
 
 	r.POST("/judge", server.Judge)
 
-	r.Run(":8010")
+	r.Run(":8090")
 }
