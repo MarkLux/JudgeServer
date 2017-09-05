@@ -12,8 +12,7 @@ const (
 )
 
 const (
-	// TEST_CASE_DIR      = "/home/judge/testcases"
-	TEST_CASE_DIR      = "/Users/mark/TestCases"
+	TEST_CASE_DIR      = "/home/judge/testcases"
 	JUDGE_RUN_LOG_PATH = "/home/judge/log/run.log"
 	SUBMISSION_DIR     = "/home/judge/submissions"
 )
