@@ -1,6 +1,7 @@
 package server
 
 import (
+	"strconv"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -160,6 +161,8 @@ func Judge(c *gin.Context) {
 
 	conf.RunConfig.Command.FillWith(map[string]string{
 		"{exe_path}": exePath,
+		"{exe_dir}":  exePath,
+		"{max_memory}": strconv.Itoa(input.MaxMemory / 1024)
 	})
 
 	// run the client
