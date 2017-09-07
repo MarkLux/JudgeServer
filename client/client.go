@@ -76,7 +76,6 @@ func (jc *JudgeClient) Judge() (judgeResult JudgeResult, err error) {
 }
 
 func (jc *JudgeClient) judgeOne(ch chan<- RunResult, testInPath string, testOutPath string, userOutFilename string) {
-	jc.RunConf.Command.FillWith(map[string]string{})
 	commands := strings.Split(string(jc.RunConf.Command), " ")
 	userOutputPath := filepath.Join(jc.SubmissionDir, userOutFilename)
 	result := judger.JudgerRun(judger.Config{

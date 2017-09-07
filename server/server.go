@@ -1,11 +1,11 @@
 package server
 
 import (
-	"strconv"
 	"net/http"
 	"os"
 	"path/filepath"
 	"runtime"
+	"strconv"
 
 	"github.com/MarkLux/JudgeServer/rsync"
 
@@ -160,9 +160,9 @@ func Judge(c *gin.Context) {
 	// todo: parse the java's exe_dir and max_memory limit
 
 	conf.RunConfig.Command.FillWith(map[string]string{
-		"{exe_path}": exePath,
-		"{exe_dir}":  exePath,
-		"{max_memory}": strconv.Itoa(input.MaxMemory / 1024)
+		"{exe_path}":   exePath,
+		"{exe_dir}":    submissionDir,
+		"{max_memory}": strconv.Itoa(input.MaxMemory / 1024),
 	})
 
 	// run the client
