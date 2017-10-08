@@ -16,3 +16,7 @@ const (
 	JUDGE_RUN_LOG_PATH = "/home/judge/log/run.log"
 	SUBMISSION_DIR     = "/home/judge/submissions"
 )
+
+const (
+	MAX_JUDGE_ROUTINES = 4
+)

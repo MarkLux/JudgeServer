@@ -40,6 +40,14 @@ type JudgeClient struct {
 	TestCaseId    int
 }
 
+type TestCase struct {
+	UserOutFilename string
+	TestInPath      string
+	TestOutPath     string
+}
+
+var instanceCount int
+
 func (jc *JudgeClient) Judge() (judgeResult JudgeResult, err error) {
 
 	// only for test
@@ -52,30 +60,49 @@ func (jc *JudgeClient) Judge() (judgeResult JudgeResult, err error) {
 	}
 
 	// build channel
-	caseCount := len(testFiles)
-	caseCh := make(chan RunResult, caseCount)
+	jobCh := make(chan TestCase, 100)
+	resCh := make(chan RunResult, 100)
 
-	for _, t := range testFiles {
-		testInPath := filepath.Join(config.TEST_CASE_DIR, strconv.Itoa(jc.TestCaseId), t+".in")
-		testOutPath := filepath.Join(config.TEST_CASE_DIR, strconv.Itoa(jc.TestCaseId), t+".out")
-		// create a new go routine for each testcase file
-		go jc.judgeOne(caseCh, testInPath, testOutPath, t+".out")
+	// routine pool
+
+	for w := 0; w < config.MAX_JUDGE_ROUTINES; w++ {
+		go worker(jc, jobCh, resCh)
 	}
 
-	for i := 0; i < caseCount; i++ {
-		rs := <-caseCh
+	// add jobs
+
+	for _, t := range testFiles {
+		tc := TestCase{
+			TestInPath:      filepath.Join(config.TEST_CASE_DIR, strconv.Itoa(jc.TestCaseId), t+".in"),
+			TestOutPath:     filepath.Join(config.TEST_CASE_DIR, strconv.Itoa(jc.TestCaseId), t+".out"),
+			UserOutFilename: t + ".out",
+		}
+		jobCh <- tc
+	}
+
+	close(jobCh)
+
+	for i := 0; i < len(testFiles); i++ {
+		rs := <-resCh
 		if rs.Result == judger.SUCCESS {
 			judgeResult.Passed = append(judgeResult.Passed, rs)
 		} else {
 			judgeResult.UnPassed = append(judgeResult.UnPassed, rs)
 		}
 	}
+
 	err = nil
 
 	return
 }
 
-func (jc *JudgeClient) judgeOne(ch chan<- RunResult, testInPath string, testOutPath string, userOutFilename string) {
+func worker(jc *JudgeClient, inCh <-chan TestCase, outCh chan<- RunResult) {
+	for t := range inCh {
+		outCh <- jc.JudgeOne(t.TestInPath, t.TestOutPath, t.UserOutFilename)
+	}
+}
+
+func (jc *JudgeClient) JudgeOne(testInPath string, testOutPath string, userOutFilename string) RunResult {
 	commands := strings.Split(string(jc.RunConf.Command), " ")
 	userOutputPath := filepath.Join(jc.SubmissionDir, userOutFilename)
 	result := judger.JudgerRun(judger.Config{
@@ -117,8 +144,8 @@ func (jc *JudgeClient) judgeOne(ch chan<- RunResult, testInPath string, testOutP
 		OutputMD5: userOutputMd5,
 		Signal:    result.Signal,
 	}
-	ch <- runResult
-	return
+
+	return runResult
 }
 
 func compareOutput(testOutPath string, userOutputPath string) (outputMd5 string, res bool) {
