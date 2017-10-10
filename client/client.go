@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strconv"
 	"strings"
 
@@ -51,7 +50,7 @@ var instanceCount int
 func (jc *JudgeClient) Judge() (judgeResult JudgeResult, err error) {
 
 	// only for test
-	runtime.GOMAXPROCS(runtime.NumCPU())
+	// runtime.GOMAXPROCS(runtime.NumCPU())
 
 	// load testcases files
 	testFiles, err := loadTestCases(jc.TestCaseId)

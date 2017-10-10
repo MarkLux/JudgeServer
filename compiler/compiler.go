@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -26,7 +27,7 @@ func Compile(compileConfig config.CompileConfig, srcPath string, outputDir strin
 		"{exe_path}": exePath,
 	}
 	command := compileConfig.CompileCommand.FillWith(replacements)
-
+	log.Println("compile command: ", command)
 	// file compiler.out contains the ouput of compile progarm's output (rewrite).
 	compilerOut := filepath.Join(outputDir, "compiler.out")
 
@@ -56,8 +57,8 @@ func Compile(compileConfig config.CompileConfig, srcPath string, outputDir strin
 
 	// debug output
 
-	// log.Printf("Compile Result\n")
-	// log.Printf("%#v\n", result)
+	log.Printf("Compile Result\n")
+	log.Printf("%#v\n", result)
 
 	if result.Result != judger.SUCCESS {
 		// read the compiler output and
@@ -73,6 +74,6 @@ func Compile(compileConfig config.CompileConfig, srcPath string, outputDir strin
 		return exePath, errors.New(errOut)
 	}
 
-	os.Remove(compilerOut)
+	// os.Remove(compilerOut)
 	return exePath, nil
 }
