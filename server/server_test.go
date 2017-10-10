@@ -1,6 +1,7 @@
 package server
 
 import (
+	"io/ioutil"
 	"log"
 	"path/filepath"
 	"strconv"
@@ -18,10 +19,66 @@ const (
 )
 
 func Test_Judge(t *testing.T) {
-	judgeTestcase("1002")
+	testcasesDirs, err := getDirs(TESTCASE_ROOT)
+
+	if err != nil {
+		t.Error("load testcases error!")
+	}
+
+	jobCh := make(chan string, 100)
+	resCh := make(chan bool, 100)
+
+	for w := 0; w < 10; w++ {
+		go worker(w, jobCh, resCh)
+	}
+
+	for _, dir := range testcasesDirs {
+		jobCh <- dir
+	}
+
+	close(jobCh)
+
+	resultArray := make(map[string]string)
+
+	for i := 0; i < len(testcasesDirs); i++ {
+		rs := <-resCh
+
+		if rs {
+			resultArray[testcasesDirs[i]] = "test ok!"
+		} else {
+			resultArray[testcasesDirs[i]] = "test failed!"
+		}
+	}
+
+	for k, v := range resultArray {
+		log.Println(k, " : ", v)
+	}
+
 }
 
-func judgeTestcase(testcaseId string) {
+func worker(id int, inCh <-chan string, outCh chan<- bool) {
+	for t := range inCh {
+		log.Println("routine ", id, " processing testcase ", t)
+		outCh <- judgeTestcase(t)
+	}
+}
+
+func getDirs(dirPth string) (files []string, err error) {
+	files = make([]string, 0, 10)
+	dir, err := ioutil.ReadDir(dirPth)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, fi := range dir {
+		if fi.IsDir() {
+			files = append(files, fi.Name())
+		}
+	}
+	return files, nil
+}
+
+func judgeTestcase(testcaseId string) bool {
 
 	var conf config.LanguageCompileConfig
 	conf = config.CompileCpp
@@ -37,7 +94,7 @@ func judgeTestcase(testcaseId string) {
 
 	if err != nil {
 		log.Println("compile error: ", err.Error())
-		return
+		return false
 	}
 
 	tId, _ := strconv.Atoi(testcaseId)
@@ -53,16 +110,20 @@ func judgeTestcase(testcaseId string) {
 		ExePath:       exePath,
 		TestCaseId:    tId,
 		SubmissionDir: submissionPath,
-		RunConf:       config.CompileCpp.RunConfig,
+		RunConf:       conf.RunConfig,
 	}
 
 	result, err := jc.Judge()
 
 	if err != nil {
 		log.Println("run time error: " + err.Error())
-		return
+		return false
 	}
 
 	log.Printf("judge result:\n%#v\n", result)
-	return
+	if len(result.UnPassed) == 0 {
+		return true
+	} else {
+		return false
+	}
 }
