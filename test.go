@@ -1,4 +1,4 @@
-package server
+package main
 
 import (
 	"fmt"
@@ -10,7 +10,6 @@ import (
 	"runtime/pprof"
 	"strconv"
 	"strings"
-	"testing"
 	"time"
 
 	"github.com/MarkLux/JudgeServer/client"
@@ -49,14 +48,14 @@ func saveHeapProfile() {
 	pprof.Lookup("heap").WriteTo(f, 1)
 }
 
-func Test_Judge(t *testing.T) {
+func main() {
 
 	// defer saveHeapProfile()
 
 	testcasesDirs, err := getDirs(TESTCASE_ROOT)
 
 	if err != nil {
-		t.Error("load testcases error!")
+		log.Fatal("load testcases error!")
 	}
 
 	jobCh := make(chan string, 100)
@@ -76,15 +75,17 @@ func Test_Judge(t *testing.T) {
 
 	for i := 0; i < len(testcasesDirs); i++ {
 		rs := <-resCh
+		log.Println("rs: ", rs)
 
 		if rs {
 			resultArray[testcasesDirs[i]] = "test ok!"
 		} else {
+			resultArray[testcasesDirs[i]] = "test failed!"
 			for k, v := range resultArray {
 				log.Println(k, " : ", v)
 			}
-			t.Fail()
-			// resultArray[testcasesDirs[i]] = "test failed!"
+			log.Fatal("shit it exited!")
+			return
 		}
 	}
 
