@@ -67,7 +67,7 @@ func Compile(compileConfig config.CompileConfig, srcPath string, outputDir strin
 		if err == nil {
 			errByte, _ := ioutil.ReadFile(compilerOut)
 			errOut = string(errByte[:])
-			os.Remove(compilerOut)
+			//os.Remove(compilerOut)
 		} else {
 			errOut = fmt.Sprintf("Compiler Runtime Error , info %#v", result)
 		}

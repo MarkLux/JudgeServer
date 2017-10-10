@@ -18,26 +18,34 @@ const (
 )
 
 func Test_Judge(t *testing.T) {
-	judgeTestcase("1001")
+	judgeTestcase("1002")
 }
 
 func judgeTestcase(testcaseId string) {
+
+	var conf config.LanguageCompileConfig
+	conf = config.CompileCpp
+
 	log.Println("start test problem ", testcaseId)
 	// 初始化变量
 	submissionPath := filepath.Join(SUBMISSION_ROOT, testcaseId)
 	srcFilePath := filepath.Join(submissionPath, "ac.cpp")
-	compileConf := config.CompileCpp.CompileConfig
 	// 编译
 	log.Println("start compiling ...")
 
-	exePath, err := compiler.Compile(compileConf, srcFilePath, submissionPath)
+	exePath, err := compiler.Compile(conf.CompileConfig, srcFilePath, submissionPath)
 
 	if err != nil {
-		log.Println("compile error")
+		log.Println("compile error: ", err.Error())
 		return
 	}
 
 	tId, _ := strconv.Atoi(testcaseId)
+
+	conf.RunConfig.Command.FillWith(map[string]string{
+		"{exe_path}": exePath,
+		"{exe_dir}":  submissionPath,
+	})
 
 	jc := client.JudgeClient{
 		MaxCpuTime:    5000,
