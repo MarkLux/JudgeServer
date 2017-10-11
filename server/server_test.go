@@ -10,6 +10,7 @@ import (
 	"runtime/pprof"
 	"strconv"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -28,6 +29,11 @@ var (
 	pid      int
 	progname string
 )
+
+var resultArray = struct {
+	sync.RWMutex
+	m map[string]string
+}{m: make(map[string]string)}
 
 func init() {
 	pid = os.Getpid()
@@ -59,8 +65,8 @@ func Test_Judge(t *testing.T) {
 		t.Error("load testcases error!")
 	}
 
-	jobCh := make(chan string, 100)
-	resCh := make(chan bool, 100)
+	jobCh := make(chan string, 1000)
+	resCh := make(chan bool, 1000)
 
 	for w := 0; w < 10; w++ {
 		go worker(w, jobCh, resCh)
@@ -72,25 +78,35 @@ func Test_Judge(t *testing.T) {
 
 	close(jobCh)
 
-	resultArray := make(map[string]string)
-
 	for i := 0; i < len(testcasesDirs); i++ {
 		rs := <-resCh
 
+		log.Println("get ", rs, "from channel")
+
 		if rs {
-			resultArray[testcasesDirs[i]] = "test ok!"
+			resultArray.Lock()
+			resultArray.m[testcasesDirs[i]] = "test ok!"
+			resultArray.Unlock()
 		} else {
-			for k, v := range resultArray {
+			resultArray.Lock()
+			resultArray.m[testcasesDirs[i]] = "test failed!"
+			resultArray.Unlock()
+			resultArray.RLock()
+			for k, v := range resultArray.m {
 				log.Println(k, " : ", v)
 			}
+			resultArray.RUnlock()
+			time.Sleep(time.Second)
 			t.Fail()
-			// resultArray[testcasesDirs[i]] = "test failed!"
+			return
 		}
 	}
 
-	for k, v := range resultArray {
+	resultArray.RLock()
+	for k, v := range resultArray.m {
 		log.Println(k, " : ", v)
 	}
+	resultArray.RUnlock()
 
 }
 
@@ -154,11 +170,11 @@ func judgeTestcase(testcaseId string) bool {
 	result, err := jc.Judge()
 
 	if err != nil {
-		log.Println("run time error: " + err.Error())
+		fmt.Println("run time error: " + err.Error())
 		return false
 	}
 
-	log.Printf("judge result:\n%#v\n", result)
+	fmt.Printf("judge result of %s:\n%#v\n", testcaseId, result)
 	if len(result.UnPassed) == 0 {
 		return true
 	} else {
