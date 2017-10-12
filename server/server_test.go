@@ -32,8 +32,13 @@ var (
 
 var resultArray = struct {
 	sync.RWMutex
-	m map[string]string
-}{m: make(map[string]string)}
+	m map[string]client.JudgeResult
+}{m: make(map[string]client.JudgeResult)}
+
+type jRes struct {
+	testcaseId string
+	result     client.JudgeResult
+}
 
 func init() {
 	pid = os.Getpid()
@@ -66,7 +71,7 @@ func Test_Judge(t *testing.T) {
 	}
 
 	jobCh := make(chan string, 1000)
-	resCh := make(chan bool, 1000)
+	resCh := make(chan jRes, 1000)
 
 	for w := 0; w < 10; w++ {
 		go worker(w, jobCh, resCh)
@@ -81,24 +86,17 @@ func Test_Judge(t *testing.T) {
 	for i := 0; i < len(testcasesDirs); i++ {
 		rs := <-resCh
 
-		log.Println("get ", rs, "from channel")
-
-		if rs {
+		if len(rs.result.UnPassed) > 0 {
 			resultArray.Lock()
-			resultArray.m[testcasesDirs[i]] = "test ok!"
+			resultArray.m[rs.testcaseId] = rs.result
 			resultArray.Unlock()
-		} else {
-			resultArray.Lock()
-			resultArray.m[testcasesDirs[i]] = "test failed!"
-			resultArray.Unlock()
-			resultArray.RLock()
-			for k, v := range resultArray.m {
-				log.Println(k, " : ", v)
-			}
-			resultArray.RUnlock()
-			time.Sleep(time.Second)
+			printJRes()
 			t.Fail()
 			return
+		} else {
+			resultArray.Lock()
+			resultArray.m[rs.testcaseId] = rs.result
+			resultArray.Unlock()
 		}
 	}
 
@@ -110,10 +108,25 @@ func Test_Judge(t *testing.T) {
 
 }
 
-func worker(id int, inCh <-chan string, outCh chan<- bool) {
+func printJRes() {
+	for k, v := range resultArray.m {
+		resultArray.RLock()
+		if len(v.UnPassed) > 0 {
+			log.Printf("%s test failed! result:\n%#v", k, v)
+		} else {
+			log.Printf("%s test ok!\n", k)
+		}
+		resultArray.RUnlock()
+	}
+}
+
+func worker(id int, inCh <-chan string, outCh chan<- jRes) {
 	for t := range inCh {
 		log.Println("routine ", id, " processing testcase ", t)
-		outCh <- judgeTestcase(t)
+		outCh <- jRes{
+			testcaseId: t,
+			result:     judgeTestcase(t),
+		}
 	}
 }
 
@@ -132,7 +145,7 @@ func getDirs(dirPth string) (files []string, err error) {
 	return files, nil
 }
 
-func judgeTestcase(testcaseId string) bool {
+func judgeTestcase(testcaseId string) client.JudgeResult {
 
 	var conf config.LanguageCompileConfig
 	conf = config.CompileCpp
@@ -148,7 +161,7 @@ func judgeTestcase(testcaseId string) bool {
 
 	if err != nil {
 		log.Println("compile error: ", err.Error())
-		return false
+		return client.JudgeResult{}
 	}
 
 	tId, _ := strconv.Atoi(testcaseId)
@@ -171,13 +184,10 @@ func judgeTestcase(testcaseId string) bool {
 
 	if err != nil {
 		fmt.Println("run time error: " + err.Error())
-		return false
+		return client.JudgeResult{}
 	}
 
-	fmt.Printf("judge result of %s:\n%#v\n", testcaseId, result)
-	if len(result.UnPassed) == 0 {
-		return true
-	} else {
-		return false
-	}
+	// fmt.Printf("judge result of %s:\n%#v\n", testcaseId, result)
+
+	return result
 }
