@@ -30,6 +30,10 @@ var (
 	progname string
 )
 
+const (
+	logFileName = "test.log"
+)
+
 var resultArray = struct {
 	sync.RWMutex
 	m map[string]client.JudgeResult
@@ -73,7 +77,7 @@ func Test_Judge(t *testing.T) {
 	jobCh := make(chan string, 1000)
 	resCh := make(chan jRes, 1000)
 
-	for w := 0; w < 10; w++ {
+	for w := 0; w < 1; w++ {
 		go worker(w, jobCh, resCh)
 	}
 
@@ -90,9 +94,11 @@ func Test_Judge(t *testing.T) {
 			resultArray.Lock()
 			resultArray.m[rs.testcaseId] = rs.result
 			resultArray.Unlock()
-			printJRes()
-			t.Fail()
-			return
+			// printJRes()
+			// close(resCh)
+			// log.Println("ALL THINGS STTOPED!")
+			// t.FailNow()
+			// return
 		} else {
 			resultArray.Lock()
 			resultArray.m[rs.testcaseId] = rs.result
@@ -100,18 +106,22 @@ func Test_Judge(t *testing.T) {
 		}
 	}
 
-	resultArray.RLock()
-	for k, v := range resultArray.m {
-		log.Println(k, " : ", v)
-	}
-	resultArray.RUnlock()
+	// resultArray.RLock()
+	// for k, v := range resultArray.m {
+	// 	log.Println(k, " : ", v)
+	// }
+	// resultArray.RUnlock()
+
+	printJRes()
+
+	return
 
 }
 
 func printJRes() {
 	for k, v := range resultArray.m {
 		resultArray.RLock()
-		if len(v.UnPassed) > 0 {
+		if len(v.Passed) <= 0 {
 			log.Printf("%s test failed! result:\n%#v", k, v)
 		} else {
 			log.Printf("%s test ok!\n", k)
@@ -183,11 +193,19 @@ func judgeTestcase(testcaseId string) client.JudgeResult {
 	result, err := jc.Judge()
 
 	if err != nil {
-		fmt.Println("run time error: " + err.Error())
+		log.Println("run time error: " + err.Error())
 		return client.JudgeResult{}
 	}
 
 	// fmt.Printf("judge result of %s:\n%#v\n", testcaseId, result)
+
+	logFile, er := os.Create(testcaseId + ".log")
+	defer logFile.Close()
+	if er != nil {
+		log.Fatalln("fail to create log file")
+	}
+
+	logFile.WriteString(fmt.Sprintf("judge result of %s:\n%#v\n", testcaseId, result))
 
 	return result
 }
