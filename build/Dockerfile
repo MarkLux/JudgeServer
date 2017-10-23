@@ -7,7 +7,8 @@ RUN apt-get update&&apt-get -y install \
     git\
     wget\
     rsync\
-    software-properties-common
+    software-properties-common\
+    python
 RUN add-apt-repository ppa:openjdk-r/ppa
 RUN apt-get update&&apt-get -y install openjdk-7-jdk
 RUN mkdir -p /home/judge
