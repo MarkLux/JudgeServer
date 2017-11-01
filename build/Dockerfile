@@ -14,8 +14,8 @@ RUN apt-get update&&apt-get -y install openjdk-7-jdk
 RUN mkdir -p /home/judge
 WORKDIR /home/judge
 RUN wget https://studygolang.com/dl/golang/go1.9.2.linux-amd64.tar.gz&&\
-    tar -xvzf go1.8.3.linux-amd64.tar.gz -C /usr/local&&\
-    rm -rf go1.8.3.linux-amd64.tar.gz&&\
+    tar -xvzf go1.9.2.linux-amd64.tar.gz -C /usr/local&&\
+    rm -rf go1.9.2.linux-amd64.tar.gz&&\
     mkdir -p /home/judge/go /home/judge/testcases /home/judge/submissions
     # echo "export GOROOT=/usr/local/go\nexport PATH=$PATH:/usr/local/go/bin\nexport GOPATH=/home/judge/go" >> ~/.bashrc
 ENV GOROOT /usr/local/go
