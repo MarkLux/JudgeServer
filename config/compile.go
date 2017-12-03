@@ -49,7 +49,7 @@ var CompileC = LanguageCompileConfig{
 		ExeName:        "main",
 		MaxCpuTime:     3000,
 		MaxRealTime:    5000,
-		MaxMemory:      256 * 1024 * 1024,
+		MaxMemory:      judger.UNLIMITED,
 		CompileCommand: "/usr/bin/gcc -DONLINE_JUDGE -O2 -w -fmax-errors=3 -std=c99 {src_path} -lm -o {exe_path}",
 	},
 	RunConfig: RunConfig{
@@ -65,7 +65,7 @@ var CompileCpp = LanguageCompileConfig{
 		ExeName:        "main",
 		MaxCpuTime:     3000,
 		MaxRealTime:    5000,
-		MaxMemory:      256 * 1024 * 1024,
+		MaxMemory:      judger.UNLIMITED,
 		CompileCommand: "/usr/bin/g++ -DONLINE_JUDGE -O2 -w -fmax-errors=3 -std=c++11 {src_path} -lm -o {exe_path}",
 	},
 	RunConfig: RunConfig{
@@ -97,7 +97,7 @@ var CompilePython2 = LanguageCompileConfig{
 		ExeName:        "solution.pyc",
 		MaxCpuTime:     3000,
 		MaxRealTime:    5000,
-		MaxMemory:      128 * 1024 * 1024,
+		MaxMemory:      judger.UNLIMITED,
 		CompileCommand: "/usr/bin/python -m py_compile {src_path}",
 	},
 	RunConfig: RunConfig{

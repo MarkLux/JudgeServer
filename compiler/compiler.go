@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -56,16 +57,16 @@ func Compile(compileConfig config.CompileConfig, srcPath string, outputDir strin
 
 	// debug output
 
-	// log.Printf("Compile Result\n")
-	// log.Printf("%#v\n", result)
-
 	if result.Result != judger.SUCCESS {
+		// log.Printf("Compile Result\n")
+		// log.Printf("%#v\n", result)
 		// read the compiler output and
 		_, err := os.Stat(compilerOut)
 		var errOut string
 		if err == nil {
 			errByte, _ := ioutil.ReadFile(compilerOut)
 			errOut = string(errByte[:])
+			log.Println(errOut)
 			//os.Remove(compilerOut)
 		} else {
 			errOut = fmt.Sprintf("Compiler Runtime Error , info %#v", result)
