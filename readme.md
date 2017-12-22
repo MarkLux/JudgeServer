@@ -98,6 +98,16 @@ response example:
 
 data contains results for each test case (`with a .in and a .out file`),with Accpted ones in `Passed` array and others in `UnPassed` array.
 
+### rsync ([GET] /rsync?tid=xxx)
+
+this api is used to keep your testcases in sync with the main rsyncd service (you need deploy and start the rsyncd service on it).
+
+on request with specific `tid`,it will call the command line to rsync the testcase dir which name is same with `tid`.
+
+the rsyncd service server and the user is defined in environment vars.
+
+**caution**: this api is still unstable. I recommend to use the shell script to keep the testcases in rsync(defined in `rsync/rsync_shell.sh`).
+
 ## build & images
 
 you can use `build/Dockerfile` to build the docker image to use
