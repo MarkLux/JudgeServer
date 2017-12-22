@@ -116,7 +116,7 @@ docker pull registry.cn-qingdao.aliyuncs.com/marklux/judge-server:latest
 # make dir
 mkdir -p judge/testcases judge/submissions judge/log judge/output
 # run the container(an example)
-docker run --name=judgeserver -d -v $PWD/judge/testcases:/home/judge/testcases -v $PWD/judge/submissions:/home/judge/submissions -v $PWD/judge/log:/home/judge/log -v $PWD/judge/output:/home/judge/output -p 8090:8090 -e "RPC_TOKEN=abcdefg" registry.cn-qingdao.aliyuncs.com/marklux/judge-server:latest
+docker run --name=judge_server -d -v $PWD/judge/testcases:/home/judge/testcases -v $PWD/judge/submissions:/home/judge/submissions -v $PWD/judge/log:/home/judge/log -v $PWD/judge/output:/home/judge/output -p 8090:8090 -e "RPC_TOKEN=abcdefg" -e "RSYNC_HOST=your_rsync.com" -e "RSYNC_USER=your_rsync_user" registry.cn-qingdao.aliyuncs.com/marklux/judge-server:latest
 ```
 
 if you failed,remember to check the volumes' permission!
