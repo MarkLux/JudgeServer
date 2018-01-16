@@ -36,7 +36,7 @@ func Compile(compileConfig config.CompileConfig, srcPath string, outputDir strin
 
 	//parse args
 
-	result := judger.JudgerRun(judger.Config{
+	result, err := judger.JudgerRun(judger.Config{
 		MaxCpuTime:       compileConfig.MaxCpuTime,
 		MaxRealTime:      compileConfig.MaxRealTime,
 		MaxMemory:        compileConfig.MaxMemory,
@@ -56,6 +56,10 @@ func Compile(compileConfig config.CompileConfig, srcPath string, outputDir strin
 	})
 
 	// debug output
+
+	if err != nil {
+		return "", err
+	}
 
 	if result.Result != judger.SUCCESS {
 		// log.Printf("Compile Result\n")

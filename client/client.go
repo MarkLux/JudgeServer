@@ -130,7 +130,7 @@ func (jc *JudgeClient) JudgeOne(testInPath string, testOutPath string, userOutFi
 			Memory:    result.Memory,
 			Result:    -1,
 			Error:     result.Error,
-			OutputMD5: result.userOutputMd5,
+			OutputMD5: "",
 			Signal:    result.Signal,
 		}
 	}
