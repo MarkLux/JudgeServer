@@ -79,7 +79,15 @@ func Judge(c *gin.Context) {
 
 	// generate submission id.
 
-	submissionId := uuid.NewV4()
+	submissionId, err := uuid.NewV4()
+
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"code": -1,
+			"data": err.Error(),
+		})
+		return
+	}
 
 	// init submission dir
 
