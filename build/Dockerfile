@@ -13,7 +13,7 @@ RUN add-apt-repository ppa:openjdk-r/ppa
 RUN apt-get update&&apt-get -y install openjdk-7-jdk
 RUN mkdir -p /home/judge
 WORKDIR /home/judge
-RUN wget https://studygolang.com/dl/golang/go1.9.2.linux-amd64.tar.gz&&\
+RUN wget https://dl.google.com/go/go1.9.2.linux-amd64.tar.gz&&\
     tar -xvzf go1.9.2.linux-amd64.tar.gz -C /usr/local&&\
     rm -rf go1.9.2.linux-amd64.tar.gz&&\
     mkdir -p /home/judge/go /home/judge/testcases /home/judge/submissions
