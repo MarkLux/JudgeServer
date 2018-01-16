@@ -12,7 +12,7 @@ import (
 
 	"github.com/MarkLux/JudgeServer/config"
 	"github.com/MarkLux/JudgeServer/utils"
-	"github.com/MarkLux/Judger_GO/judger"
+	"github.com/MarkLux/Judger_GO"
 )
 
 type JudgeResult struct {
