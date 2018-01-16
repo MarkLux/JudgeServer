@@ -31,7 +31,9 @@ RUN go get -v github.com/MarkLux/Judger_GO&&\
     go get -u -v github.com/gin-gonic/gin&&\
     go get -u -v github.com/satori/go.uuid
 WORKDIR /home/judge/go/src/github.com/MarkLux/Judger_GO
+RUN git checkout cmd_exec
 RUN mv libjudger.so /usr/lib/judger/libjudger.so
+RUN chmod +x /usr/lib/judger/libjudger.so
 RUN apt-get clean \
     && apt-get autoclean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* 

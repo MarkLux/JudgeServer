@@ -12,7 +12,6 @@ import (
 
 	"github.com/MarkLux/JudgeServer/config"
 	"github.com/MarkLux/JudgeServer/utils"
-	"github.com/MarkLux/Judger_GO"
 )
 
 type JudgeResult struct {
@@ -104,7 +103,7 @@ func worker(jc *JudgeClient, inCh <-chan TestCase, outCh chan<- RunResult) {
 func (jc *JudgeClient) JudgeOne(testInPath string, testOutPath string, userOutFilename string) RunResult {
 	commands := strings.Split(string(jc.RunConf.Command), " ")
 	userOutputPath := filepath.Join(jc.SubmissionDir, userOutFilename)
-	result := judger.JudgerRun(judger.Config{
+	result, error := judger.JudgerRun(judger.Config{
 		MaxCpuTime:       jc.MaxCpuTime,
 		MaxMemory:        jc.MaxMemory,
 		MaxStack:         128 * 1024 * 1024,
@@ -122,6 +121,18 @@ func (jc *JudgeClient) JudgeOne(testInPath string, testOutPath string, userOutFi
 		Uid:              config.RUN_USER_UID,
 		Gid:              config.RUN_GROUP_UID,
 	})
+
+	if error != nil {
+		return RunResult{
+			CpuTime:   result.CpuTime,
+			RealTime:  result.RealTime,
+			Memory:    result.Memory,
+			Result:    -1,
+			Error:     result.Error,
+			OutputMD5: userOutputMd5,
+			Signal:    result.Signal,
+		}
+	}
 
 	// if result.Error != judger.SUCCESS {
 	// 	err = errors.New("Runtime Error, Code" + fmt.Sprintf("%#v", result))
