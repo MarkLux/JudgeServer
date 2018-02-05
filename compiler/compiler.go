@@ -47,7 +47,7 @@ func Compile(compileConfig config.CompileConfig, srcPath string, outputDir strin
 		InputPath:        srcPath,
 		OutputPath:       compilerOut,
 		ErrorPath:        compilerOut,
-		Args:             args,
+		Args:             args[1:], // suit new Judger,ignore the exepath
 		Env:              []string{"PATH=" + os.Getenv("PATH")},
 		LogPath:          config.COMPILER_LOG_PATH,
 		SecCompRuleName:  "none",

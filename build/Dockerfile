@@ -1,4 +1,4 @@
-FROM ubuntu:14.04
+FROM registry.docker-cn.com/library/ubuntu:16.04
 MAINTAINER MarkLux
 # ADD sources.list /etc/apt/sources.list
 RUN apt-get update&&apt-get -y install \

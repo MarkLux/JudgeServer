@@ -115,7 +115,7 @@ func (jc *JudgeClient) JudgeOne(testInPath string, testOutPath string, userOutFi
 		InputPath:        testInPath,
 		OutputPath:       userOutputPath,
 		ErrorPath:        userOutputPath,
-		Args:             commands,
+		Args:             commands[1:],
 		Env:              append(jc.RunConf.Env, "PATH="+os.Getenv("PATH")),
 		LogPath:          config.JUDGE_RUN_LOG_PATH,
 		SecCompRuleName:  jc.RunConf.SeccompRule,
